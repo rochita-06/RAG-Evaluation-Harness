@@ -1,0 +1,145 @@
+[
+  {
+    "timestamp": "2026-08-02T18:12:35.228069",
+    "query": "why did kattappa kill bahubali",
+    "category": "Character",
+    "setting": "A",
+    "response_time_ms": 5396.5,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T18:12:35.266100",
+    "query": "why did kattappa kill bahubali",
+    "category": "Character",
+    "setting": "B",
+    "response_time_ms": 1538.5,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T18:20:09.280271",
+    "query": "Describe the Kingdom of Mahishmati?",
+    "category": "Kingdom",
+    "setting": "A",
+    "response_time_ms": 1460.3,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T18:20:09.323820",
+    "query": "Describe the Kingdom of Mahishmati?",
+    "category": "Kingdom",
+    "setting": "B",
+    "response_time_ms": 1508.5,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T18:20:33.074772",
+    "query": "Who is Spiderman?",
+    "category": "out_of_scope",
+    "setting": "N/A",
+    "response_time_ms": 0,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": false,
+    "answer_preview": ""
+  },
+  {
+    "timestamp": "2026-08-02T18:33:50.458272",
+    "query": "who is bahubali",
+    "category": "Character",
+    "setting": "A",
+    "response_time_ms": 1245.7,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T18:33:50.491453",
+    "query": "who is bahubali",
+    "category": "Character",
+    "setting": "B",
+    "response_time_ms": 1228.4,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T18:37:21.172141",
+    "query": "why did kattappa kill bahubali",
+    "category": "Character",
+    "setting": "A",
+    "response_time_ms": 1312.6,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T18:37:21.204190",
+    "query": "why did kattappa kill bahubali",
+    "category": "Character",
+    "setting": "B",
+    "response_time_ms": 1227.7,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T18:40:03.900268",
+    "query": "why did kattappa kill bahubali?",
+    "category": "Character",
+    "setting": "A",
+    "response_time_ms": 3964.3,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T18:40:03.936374",
+    "query": "why did kattappa kill bahubali?",
+    "category": "Character",
+    "setting": "B",
+    "response_time_ms": 1664.0,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T21:29:46.673584",
+    "query": "who is bahubali",
+    "category": "Character",
+    "setting": "A",
+    "response_time_ms": 3679.0,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  },
+  {
+    "timestamp": "2026-08-02T21:29:46.699654",
+    "query": "who is bahubali",
+    "category": "Character",
+    "setting": "B",
+    "response_time_ms": 878.7,
+    "faithfulness_score": null,
+    "retrieval_score": null,
+    "is_in_scope": true,
+    "answer_preview": "⚠️ **xAI API Notice:** The Grok API key has no active credits (*403 Permission Denied*). You can update `XAI_API_KEY` in `.env` or in the sidebar.\n\n---\n\n### 📜 Mahishmati Archives Direct Retrieval Synt"
+  }
+]
