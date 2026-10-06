@@ -2,6 +2,8 @@ import sys
 import os
 
 sys.path.insert(0, os.path.abspath("."))
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 from src.vector_store import build_index, query_collection
 from src.hybrid_retriever import hybrid_search

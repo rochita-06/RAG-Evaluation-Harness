@@ -15,7 +15,7 @@ load_dotenv()
 # ── Provider credentials ─────────────────────────────────────────────────────
 GROQ_API_KEY  = os.getenv("GROQ_API_KEY", "")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-GROQ_MODEL    = "llama-3.3-70b-versatile"
+GROQ_MODEL    = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
 XAI_API_KEY   = os.getenv("XAI_API_KEY", "")
 XAI_BASE_URL  = "https://api.x.ai/v1"
@@ -65,14 +65,31 @@ def _build_pool(custom_api_key: Optional[str] = None) -> List[Tuple[str, object,
 
 def _call_openai_provider(client, model: str, messages: List[Dict],
                            max_tokens: int, temperature: float) -> str:
-    """Call an OpenAI-compatible provider (Groq or Grok)."""
-    resp = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        max_tokens=max_tokens,
-        temperature=temperature,
-    )
-    return resp.choices[0].message.content.strip()
+    """Call an OpenAI-compatible provider (Groq or Grok) with resilient model fallback."""
+    candidate_models = [model]
+    base_url = str(getattr(client, "base_url", ""))
+    if "api.groq.com" in base_url:
+        for backup in ["openai/gpt-oss-120b", "qwen/qwen3.8-27b", "llama-3.3-70b-versatile"]:
+            if backup not in candidate_models:
+                candidate_models.append(backup)
+
+    last_exc = None
+    for m in candidate_models:
+        try:
+            resp = client.chat.completions.create(
+                model=m,
+                messages=messages,
+                max_tokens=max_tokens,
+                temperature=temperature,
+            )
+            return resp.choices[0].message.content.strip()
+        except Exception as e:
+            last_exc = e
+            err_msg = str(e).lower()
+            if "model" in err_msg and ("not found" in err_msg or "decommissioned" in err_msg or "does not exist" in err_msg or "404" in err_msg):
+                continue
+            raise e
+    raise last_exc
 
 
 def _call_gemini_provider(api_key: str, model: str, messages: List[Dict],

@@ -3,6 +3,8 @@ import os
 
 # Add root to sys.path
 sys.path.insert(0, os.path.abspath("."))
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 from dotenv import load_dotenv
 load_dotenv()

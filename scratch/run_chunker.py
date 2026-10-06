@@ -1,6 +1,8 @@
 """Run chunker to produce both JSONL files."""
 import sys
 sys.path.insert(0, '.')
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 
 from backend.config import KNOWLEDGE_BASE_PATH, CHUNKS_A_PATH, CHUNKS_B_PATH
 from backend.ingestion.pdf_loader import load_knowledge_base

@@ -13,7 +13,7 @@ load_dotenv(_ROOT / ".env")
 # ── LLM Configuration (Gemini -> Groq -> Grok Pool) ──────────────────────────────────
 GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 GROQ_BASE_URL: str = "https://api.groq.com/openai/v1"
-GROQ_MODEL: str = "llama-3.3-70b-versatile"
+GROQ_MODEL: str = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
 GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "") or os.getenv("gemini_api_key", "")
 GEMINI_MODEL: str = "gemini-2.0-flash"

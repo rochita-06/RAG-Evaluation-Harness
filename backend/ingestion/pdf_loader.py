@@ -28,25 +28,35 @@ def load_pdf(file_path: str) -> List[Dict]:
     Load a PDF file page by page using PyMuPDF (fitz).
     Returns list of {text, metadata} dicts — one per page.
     """
-    try:
-        import fitz  # PyMuPDF
-    except ImportError:
-        raise ImportError("PyMuPDF not installed. Run: pip install pymupdf")
-
     path = Path(file_path)
     if not path.exists():
         raise FileNotFoundError(f"PDF not found: {file_path}")
 
-    doc = fitz.open(str(path))
     pages = []
-    for page_num, page in enumerate(doc, start=1):
-        text = page.get_text("text").strip()
-        if text:  # skip blank pages
-            pages.append({
-                "text": text,
-                "metadata": {"source": path.name, "page": page_num},
-            })
-    doc.close()
+    try:
+        import fitz  # PyMuPDF
+        doc = fitz.open(str(path))
+        for page_num, page in enumerate(doc, start=1):
+            text = page.get_text("text").strip()
+            if text:
+                pages.append({
+                    "text": text,
+                    "metadata": {"source": path.name, "page": page_num},
+                })
+        doc.close()
+    except ImportError:
+        try:
+            from pypdf import PdfReader
+            reader = PdfReader(str(path))
+            for page_num, page in enumerate(reader.pages, start=1):
+                text = (page.extract_text() or "").strip()
+                if text:
+                    pages.append({
+                        "text": text,
+                        "metadata": {"source": path.name, "page": page_num},
+                    })
+        except ImportError:
+            raise ImportError("Neither PyMuPDF (fitz) nor pypdf is installed. Run: pip install pypdf")
 
     print(f"[pdf_loader] Loaded {len(pages)} pages from {path.name}")
     return pages

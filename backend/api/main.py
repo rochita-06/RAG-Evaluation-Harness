@@ -54,10 +54,49 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize DB on startup
+def ensure_backend_indexes():
+    """Ensure ChromaDB collections and BM25 index are built if missing."""
+    try:
+        from backend.config import KNOWLEDGE_BASE_PATH, CHUNKS_A_PATH, CHUNKS_B_PATH, BM25_INDEX_PATH, SETTING_A, SETTING_B
+        from backend.vectordb.chroma_store import collection_count, build_collection
+        from backend.vectordb.bm25_store import build_bm25_index
+        from backend.ingestion.pdf_loader import load_knowledge_base
+        from backend.ingestion.chunker import chunk_for_setting_a, chunk_for_setting_b, save_chunks_jsonl, load_chunks_jsonl
+
+        count_a = collection_count(SETTING_A["collection_name"])
+        count_b = collection_count(SETTING_B["collection_name"])
+        bm25_exists = BM25_INDEX_PATH.exists()
+
+        if count_a > 0 and count_b > 0 and bm25_exists:
+            return
+
+        print("[backend startup] Initializing knowledge base indexes...")
+        if not (CHUNKS_A_PATH.exists() and CHUNKS_B_PATH.exists()):
+            docs = load_knowledge_base(str(KNOWLEDGE_BASE_PATH))
+            chunks_a = chunk_for_setting_a(docs)
+            chunks_b = chunk_for_setting_b(docs)
+            save_chunks_jsonl(chunks_a, str(CHUNKS_A_PATH))
+            save_chunks_jsonl(chunks_b, str(CHUNKS_B_PATH))
+        else:
+            chunks_a = load_chunks_jsonl(str(CHUNKS_A_PATH))
+            chunks_b = load_chunks_jsonl(str(CHUNKS_B_PATH))
+
+        if count_a == 0:
+            build_collection(SETTING_A["collection_name"], chunks_a)
+        if count_b == 0:
+            build_collection(SETTING_B["collection_name"], chunks_b)
+        if not bm25_exists:
+            build_bm25_index(chunks_b)
+        print("[backend startup] Knowledge base indexes initialized successfully.")
+    except Exception as e:
+        print(f"[backend startup] Warning: Failed to auto-initialize indexes: {e}")
+
+
+# Initialize DB and indexes on startup
 @app.on_event("startup")
 async def startup_event():
     init_db()
+    ensure_backend_indexes()
 
 
 # ── Request / Response Models ─────────────────────────────────────────────────

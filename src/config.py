@@ -10,7 +10,7 @@ load_dotenv()
 # --- LLM Providers (Multi-Provider Pool: Gemini -> Groq -> Grok) ---
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "") or os.getenv("gemini_api_key", "")
 GEMINI_MODEL = "gemini-2.0-flash"
