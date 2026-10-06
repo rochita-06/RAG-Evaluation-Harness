@@ -40,8 +40,8 @@ SETTING_B = {
     "chunk_size": 350,
     "chunk_overlap": 70,
     "collection_name": "baahubali_hybrid_350",
-    "top_k": 5,
-    "description": "Granular hybrid retrieval (chunk=350, BM25+Dense RRF)",
+    "top_k": 3,
+    "description": "Granular hybrid retrieval (chunk=350, BM25+Dense RRF, top_k=3)",
 }
 
 # --- RRF Parameters ---

@@ -30,7 +30,7 @@ def generate_answer(
     t0 = time.perf_counter()
 
     try:
-        text, provider = _pool_call(messages, max_tokens=max_tokens, temperature=temperature)
+        text, provider, _ = _pool_call(messages, max_tokens=max_tokens, temperature=temperature)
     except Exception as e:
         text = _fallback_synthesis(query, context_chunks, str(e))
 

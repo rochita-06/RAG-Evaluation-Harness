@@ -64,8 +64,8 @@ def _build_pool(custom_api_key: Optional[str] = None) -> List[Tuple[str, object,
 
 
 def _call_openai_provider(client, model: str, messages: List[Dict],
-                           max_tokens: int, temperature: float) -> str:
-    """Call an OpenAI-compatible provider (Groq or Grok) with resilient model fallback."""
+                           max_tokens: int, temperature: float) -> Tuple[str, int]:
+    """Call an OpenAI-compatible provider (Groq or Grok) with resilient model fallback and token count."""
     candidate_models = [model]
     base_url = str(getattr(client, "base_url", ""))
     if "api.groq.com" in base_url:
@@ -82,7 +82,14 @@ def _call_openai_provider(client, model: str, messages: List[Dict],
                 max_tokens=max_tokens,
                 temperature=temperature,
             )
-            return resp.choices[0].message.content.strip()
+            text = resp.choices[0].message.content.strip()
+            tokens = 0
+            if hasattr(resp, "usage") and resp.usage:
+                tokens = getattr(resp.usage, "total_tokens", 0) or 0
+            if tokens == 0:
+                prompt_len = sum(len(msg.get("content", "")) for msg in messages)
+                tokens = max(1, (prompt_len + len(text)) // 4)
+            return text, tokens
         except Exception as e:
             last_exc = e
             err_msg = str(e).lower()
@@ -93,8 +100,8 @@ def _call_openai_provider(client, model: str, messages: List[Dict],
 
 
 def _call_gemini_provider(api_key: str, model: str, messages: List[Dict],
-                           max_tokens: int, temperature: float) -> str:
-    """Call Gemini via the google-genai SDK."""
+                           max_tokens: int, temperature: float) -> Tuple[str, int]:
+    """Call Gemini via the google-genai SDK with token count."""
     try:
         import google.generativeai as genai
     except ImportError:
@@ -122,7 +129,13 @@ def _call_gemini_provider(api_key: str, model: str, messages: List[Dict],
             combined_text += f"\n[Previous Response]\n{content}\n\n"
 
     response = gemini_model.generate_content(combined_text)
-    return response.text.strip()
+    text = response.text.strip()
+    tokens = 0
+    if hasattr(response, "usage_metadata") and response.usage_metadata:
+        tokens = getattr(response.usage_metadata, "total_token_count", 0) or 0
+    if tokens == 0:
+        tokens = max(1, (len(combined_text) + len(text)) // 4)
+    return text, tokens
 
 
 def _pool_call(
@@ -130,9 +143,9 @@ def _pool_call(
     max_tokens: int = 1024,
     temperature: float = 0.3,
     custom_api_key: Optional[str] = None,
-) -> Tuple[str, str]:
+) -> Tuple[str, str, int]:
     """
-    Call the LLM provider pool in order. Returns (text, provider_name).
+    Call the LLM provider pool in order. Returns (text, provider_name, tokens_used).
     Raises RuntimeError if all providers fail.
     """
     pool = _build_pool(custom_api_key)
@@ -144,10 +157,10 @@ def _pool_call(
     for name, client_or_key, model, ptype in pool:
         try:
             if ptype == "openai":
-                text = _call_openai_provider(client_or_key, model, messages, max_tokens, temperature)
+                text, tokens = _call_openai_provider(client_or_key, model, messages, max_tokens, temperature)
             else:
-                text = _call_gemini_provider(client_or_key, model, messages, max_tokens, temperature)
-            return text, name
+                text, tokens = _call_gemini_provider(client_or_key, model, messages, max_tokens, temperature)
+            return text, name, tokens
         except Exception as e:
             last_error = f"{name}: {e}"
             continue
@@ -216,12 +229,13 @@ def generate_answer(
     ]
 
     try:
-        answer, provider = _pool_call(messages, max_tokens=1024,
-                                      temperature=temperature, custom_api_key=custom_api_key)
-        return {"answer": answer, "model": provider, "tokens_used": 0}
+        answer, provider, tokens = _pool_call(messages, max_tokens=1024,
+                                              temperature=temperature, custom_api_key=custom_api_key)
+        return {"answer": answer, "model": provider, "tokens_used": tokens}
     except Exception as e:
         fallback = _fallback_synthesis(query, context_chunks, str(e))
-        return {"answer": fallback, "model": "Direct-Synthesis (Fallback)", "tokens_used": 0}
+        est_tokens = max(1, (len(context_str) + len(fallback)) // 4)
+        return {"answer": fallback, "model": "Direct-Synthesis (Fallback)", "tokens_used": est_tokens}
 
 
 def evaluate_with_llm(
@@ -239,8 +253,8 @@ def evaluate_with_llm(
     ]
 
     try:
-        text, _ = _pool_call(messages, max_tokens=1024,
-                             temperature=temperature, custom_api_key=custom_api_key)
+        text, _, _ = _pool_call(messages, max_tokens=1024,
+                                temperature=temperature, custom_api_key=custom_api_key)
         return text
     except Exception as e:
         return json.dumps({"error": str(e)})
@@ -259,7 +273,7 @@ def call_llm_raw(
     """
     messages = [{"role": "user", "content": prompt}]
     try:
-        text, _ = _pool_call(messages, max_tokens=max_tokens, temperature=temperature, custom_api_key=custom_api_key)
+        text, _, _ = _pool_call(messages, max_tokens=max_tokens, temperature=temperature, custom_api_key=custom_api_key)
         return text
     except Exception as e:
         return json.dumps({"error": str(e)})

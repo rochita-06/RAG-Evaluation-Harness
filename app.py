@@ -228,15 +228,23 @@ with st.sidebar:
         enable_expansion = st.checkbox(":material/psychology: Enable AI Query Expansion", value=True, help="Use the LLM to rewrite and optimize your query for better retrieval.")
         st.session_state.enable_query_expansion = enable_expansion
 
+        k_col1, k_col2 = st.columns(2)
+        with k_col1:
+            st.session_state.top_k_a = st.slider("Setting A Chunks", 1, 10, st.session_state.get("top_k_a", SETTING_A["top_k"]), help="Number of broad dense chunks (chunk=1000)")
+        with k_col2:
+            st.session_state.top_k_b = st.slider("Setting B Chunks", 1, 10, st.session_state.get("top_k_b", SETTING_B["top_k"]), help="Number of granular hybrid chunks (chunk=350)")
+
         st.markdown(f"""
         **Setting A** — Dense Vector
-        - Chunk size: `{SETTING_A['chunk_size']}`
-        - Overlap: `{SETTING_A['chunk_overlap']}`
+        - Chunk size: `{SETTING_A['chunk_size']} chars`
+        - Overlap: `{SETTING_A['chunk_overlap']} chars`
+        - Retrieved chunks: `{st.session_state.get('top_k_a', SETTING_A['top_k'])}`
         - Method: ChromaDB cosine similarity
 
         **Setting B** — Hybrid RRF
-        - Chunk size: `{SETTING_B['chunk_size']}`
-        - Overlap: `{SETTING_B['chunk_overlap']}`
+        - Chunk size: `{SETTING_B['chunk_size']} chars`
+        - Overlap: `{SETTING_B['chunk_overlap']} chars`
+        - Retrieved chunks: `{st.session_state.get('top_k_b', SETTING_B['top_k'])}`
         - Method: BM25 + Dense + RRF (k=60)
         """)
 
@@ -276,18 +284,21 @@ def run_query(query: str, setting: str = "both", custom_api_key: Optional[str] =
     from src.hybrid_retriever import hybrid_search
     from src.llm_engine import generate_answer
 
+    top_k_a = st.session_state.get("top_k_a", SETTING_A["top_k"])
+    top_k_b = st.session_state.get("top_k_b", SETTING_B["top_k"])
+
     results = {}
 
     if setting in ["both", "A"]:
         start = time.time()
-        chunks_a = query_collection(SETTING_A["collection_name"], query, SETTING_A["top_k"])
+        chunks_a = query_collection(SETTING_A["collection_name"], query, top_k_a)
         answer_a = generate_answer(query, chunks_a, custom_api_key=custom_api_key)
         time_a = time.time() - start
         results["A"] = {"chunks": chunks_a, "answer": answer_a, "time": time_a}
 
     if setting in ["both", "B"]:
         start = time.time()
-        chunks_b = hybrid_search(query, SETTING_B["top_k"])
+        chunks_b = hybrid_search(query, top_k_b)
         answer_b = generate_answer(query, chunks_b, custom_api_key=custom_api_key)
         time_b = time.time() - start
         results["B"] = {"chunks": chunks_b, "answer": answer_b, "time": time_b}
@@ -473,10 +484,12 @@ if page == ":material/shield: Query Engine":
                             st.metric("Tokens Used", r['answer']['tokens_used'])
                         st.markdown(r["answer"]["answer"])
 
-                        with st.expander(f":material/description: Context Chunks ({len(r['chunks'])} retrieved)"):
+                        total_chars_a = sum(len(c.get("text", "")) for c in r["chunks"])
+                        with st.expander(f":material/description: Context Chunks ({len(r['chunks'])} retrieved • {total_chars_a:,} chars • 1000-char broad)"):
                             for i, chunk in enumerate(r["chunks"]):
                                 sim = chunk.get("similarity", 0)
-                                st.markdown(f"**Chunk {i+1}** — similarity: `{sim:.4f}`")
+                                chunk_len = len(chunk.get("text", ""))
+                                st.markdown(f"**Chunk {i+1}** — Similarity: `{sim:.4f}` • `{chunk_len}` chars")
                                 st.markdown(f"> {chunk['text'][:500]}...")
                                 st.markdown("---")
 
@@ -495,10 +508,12 @@ if page == ":material/shield: Query Engine":
                             st.metric("Tokens Used", r['answer']['tokens_used'])
                         st.markdown(r["answer"]["answer"])
 
-                        with st.expander(f":material/description: Context Chunks ({len(r['chunks'])} retrieved)"):
+                        total_chars_b = sum(len(c.get("text", "")) for c in r["chunks"])
+                        with st.expander(f":material/description: Context Chunks ({len(r['chunks'])} retrieved • {total_chars_b:,} chars • 350-char granular)"):
                             for i, chunk in enumerate(r["chunks"]):
                                 rrf = chunk.get("rrf_score", 0)
-                                st.markdown(f"**Chunk {i+1}** — RRF score: `{rrf:.6f}`")
+                                chunk_len = len(chunk.get("text", ""))
+                                st.markdown(f"**Chunk {i+1}** — RRF Score: `{rrf:.6f}` • `{chunk_len}` chars")
                                 st.markdown(f"> {chunk['text'][:500]}...")
                                 st.markdown("---")
 
